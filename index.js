@@ -3,6 +3,7 @@ var winningWord = '';
 var currentRow = 1;
 var guess = '';
 var gamesPlayed = [];
+var words = [];
 
 // Query Selectors
 var inputs = document.querySelectorAll('input');
@@ -50,6 +51,7 @@ function getRandomWord() {
   fetch("http://localhost:3001/api/v1/words")
     .then(res => res.json())
     .then(data => {
+      words = data;
       let randInd = Math.floor(Math.random() * data.length);
       winningWord = data[randInd]
     })
@@ -106,7 +108,7 @@ function submitGuess() {
     errorMessage.innerText = 'Not a valid word. Try again!';
   }
 }
-// this checks the words.js file if it includes the guess"
+
 function checkIsWord() {
   guess = '';
 
