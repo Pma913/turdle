@@ -22,7 +22,7 @@ var gameOverBox = document.querySelector('#game-over-section');
 var gameOverGuessCount = document.querySelector('#game-over-guesses-count');
 var gameOverGuessGrammar = document.querySelector('#game-over-guesses-plural');
 var gameOverMessage = document.querySelector('#game-over-message');
-var winningDisplay = document.querySelector('.informational-text')
+var winningDisplay = document.querySelector('#game-done')
 
 // Event Listeners
 window.addEventListener('load', setGame);
@@ -106,6 +106,7 @@ function submitGuess() {
       setTimeout(declareWinner, 1000);
     } else if (!checkForWin() && currentRow === 6) {
       setTimeout(declareWinner(), 1000)
+      setTimeout(resetText, 5000)
     } else {
       changeRow();
     }
@@ -187,11 +188,10 @@ function declareWinner() {
   setTimeout(startNewGame, 4000);
 }
 
-// function declareLoser() {
-//   recordGameStats();
-//   viewGameOverMessage();
-//   setTimeout(startNewGame, 4000);
-// }
+function resetText() {
+  gameOverMessage.innerText = "Yay!"
+  winningDisplay.classList.remove('collapsed')
+}
 
 function recordGameStats() {
   gamesPlayed.push({ solved: true, guesses: currentRow });
@@ -202,7 +202,7 @@ function changeGameOverText() {
 
   if (!checkForWin()) {
     gameOverMessage.innerText = "You lost"
-    winningDisplay.classList.add('hidden')
+    winningDisplay.classList.add('collapsed')
   } else if (currentRow < 2) {
     gameOverGuessGrammar.classList.add('collapsed');
   } else {
