@@ -4,6 +4,7 @@ var currentRow = 1;
 var guess = '';
 var gamesPlayed = [];
 var words = [];
+var nextIndex;
 
 // Query Selectors
 var inputs = document.querySelectorAll('input');
@@ -20,6 +21,8 @@ var stats = document.querySelector('#stats-section');
 var gameOverBox = document.querySelector('#game-over-section');
 var gameOverGuessCount = document.querySelector('#game-over-guesses-count');
 var gameOverGuessGrammar = document.querySelector('#game-over-guesses-plural');
+var gameOverMessage = document.querySelector('#game-over-message');
+var winningDisplay = document.querySelector('.informational-text')
 
 // Event Listeners
 window.addEventListener('load', setGame);
@@ -72,8 +75,8 @@ function updateInputPermissions() {
 function moveToNextInput(e) {
   var key = e.keyCode || e.charCode;
   if( key >= 65 && key <= 90) {
-    var indexOfNext = parseInt(e.target.id.split('-')[2]) + 1;
-    inputs[indexOfNext].focus();
+    nextIndex = parseInt(e.target.id.split('-')[2]) + 1;
+    inputs[nextIndex].focus();
   } else if (key === 8) {
     var indexOfPrev = parseInt(e.target.id.split('-')[2]) - 1;
     inputs[indexOfPrev].focus();
@@ -101,12 +104,16 @@ function submitGuess() {
     compareGuess();
     if (checkForWin()) {
       setTimeout(declareWinner, 1000);
+    } else if (!checkForWin() && currentRow === 6) {
+      setTimeout(declareWinner(), 1000)
     } else {
       changeRow();
     }
   } else {
     errorMessage.innerText = 'Not a valid word. Try again!';
   }
+
+  inputs[nextIndex].focus();
 }
 
 function checkIsWord() {
@@ -180,13 +187,23 @@ function declareWinner() {
   setTimeout(startNewGame, 4000);
 }
 
+// function declareLoser() {
+//   recordGameStats();
+//   viewGameOverMessage();
+//   setTimeout(startNewGame, 4000);
+// }
+
 function recordGameStats() {
   gamesPlayed.push({ solved: true, guesses: currentRow });
 }
 
 function changeGameOverText() {
   gameOverGuessCount.innerText = currentRow;
-  if (currentRow < 2) {
+
+  if (!checkForWin()) {
+    gameOverMessage.innerText = "You lost"
+    winningDisplay.classList.add('hidden')
+  } else if (currentRow < 2) {
     gameOverGuessGrammar.classList.add('collapsed');
   } else {
     gameOverGuessGrammar.classList.remove('collapsed');
