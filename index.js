@@ -47,8 +47,12 @@ function setGame() {
 }
 
 function getRandomWord() {
-  var randomIndex = Math.floor(Math.random() * 2500);
-  return words[randomIndex];
+  fetch("http://localhost:3001/api/v1/words")
+    .then(res => res.json())
+    .then(data => {
+      let randInd = Math.floor(Math.random() * data.length);
+      winningWord = data[randInd]
+    })
 }
 
 function updateInputPermissions() {
