@@ -69,10 +69,12 @@ function updateInputPermissions() {
 
 function moveToNextInput(e) {
   var key = e.keyCode || e.charCode;
-
-  if( key !== 8 && key !== 46 ) {
+  if( key >= 65 && key <= 90) {
     var indexOfNext = parseInt(e.target.id.split('-')[2]) + 1;
     inputs[indexOfNext].focus();
+  } else if (key === 8) {
+    var indexOfPrev = parseInt(e.target.id.split('-')[2]) - 1;
+    inputs[indexOfPrev].focus();
   }
 }
 
@@ -104,7 +106,7 @@ function submitGuess() {
     errorMessage.innerText = 'Not a valid word. Try again!';
   }
 }
-
+// this checks the words.js file if it includes the guess"
 function checkIsWord() {
   guess = '';
 
