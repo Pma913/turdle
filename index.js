@@ -194,7 +194,11 @@ function resetText() {
 }
 
 function recordGameStats() {
-  gamesPlayed.push({ solved: true, guesses: currentRow });
+  if (checkForWin()) {
+    gamesPlayed.push({ solved: true, guesses: currentRow });
+  } else {
+    gamesPlayed.push({ solved: false, guesses: currentRow });
+  }
 }
 
 function changeGameOverText() {
