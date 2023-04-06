@@ -23,6 +23,9 @@ var gameOverGuessCount = document.querySelector('#game-over-guesses-count');
 var gameOverGuessGrammar = document.querySelector('#game-over-guesses-plural');
 var gameOverMessage = document.querySelector('#game-over-message');
 var winningDisplay = document.querySelector('#game-done')
+var totalGames = document.querySelector('#stats-total-games')
+var percentGamesWon = document.querySelector('#stats-percent-correct')
+var averageGuessCount = document.querySelector('#stats-average-guesses')
 
 // Event Listeners
 window.addEventListener('load', setGame);
@@ -235,6 +238,19 @@ function clearKey() {
   }
 }
 
+function updateStats() {
+  let gamesWon = gamesPlayed.filter(game => game.solved);
+  let numberOfGuesses = gamesWon.map(game => game.guesses);
+  let sumOfGuesses = numberOfGuesses.reduce((acc, guess) => {
+    acc += guess;
+    return acc;
+  }, 0);
+  
+  totalGames.innerText = `${gamesPlayed.length}`;
+  percentGamesWon.innerText = `${Math.floor((gamesWon.length / gamesPlayed.length) * 100)}`;
+  averageGuessCount.innerText = `${sumOfGuesses / gamesPlayed.length}`;
+}
+
 // Change Page View Functions
 
 function viewRules() {
@@ -259,6 +275,7 @@ function viewGame() {
 }
 
 function viewStats() {
+  updateStats();
   letterKey.classList.add('hidden');
   gameBoard.classList.add('collapsed');
   rules.classList.add('collapsed');
