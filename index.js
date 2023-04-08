@@ -5,7 +5,8 @@ var guess = '';
 // var gamesPlayed = [];
 // var words = [];
 var nextIndex;
-var lastGame = {}
+var lastGame = {};
+var easy = false;
 
 // Query Selectors
 var inputs = document.querySelectorAll('input');
@@ -23,10 +24,11 @@ var gameOverBox = document.querySelector('#game-over-section');
 var gameOverGuessCount = document.querySelector('#game-over-guesses-count');
 var gameOverGuessGrammar = document.querySelector('#game-over-guesses-plural');
 var gameOverMessage = document.querySelector('#game-over-message');
-var winningDisplay = document.querySelector('#game-done')
-var totalGames = document.querySelector('#stats-total-games')
-var percentGamesWon = document.querySelector('#stats-percent-correct')
-var averageGuessCount = document.querySelector('#stats-average-guesses')
+var winningDisplay = document.querySelector('#game-done');
+var totalGames = document.querySelector('#stats-total-games');
+var percentGamesWon = document.querySelector('#stats-percent-correct');
+var averageGuessCount = document.querySelector('#stats-average-guesses');
+var difficultyButton = document.querySelector('#difficulty-button');
 
 // Event Listeners
 window.addEventListener('load', setGame);
@@ -43,7 +45,20 @@ viewGameButton.addEventListener('click', viewGame);
 
 viewStatsButton.addEventListener('click', viewStats);
 
+difficultyButton.addEventListener('click', changeDifficulty)
 // Functions
+function changeDifficulty() {
+  if (easy) {
+    easy = false;
+    difficultyButton.innerText = `easy mode`;
+  } else {
+    easy = true;
+    difficultyButton.innerText = `hard mode`;
+  }
+
+  startNewGame()
+}
+
 function setGame() {
   currentRow = 1;
   winningWord = getRandomWord();
@@ -55,9 +70,21 @@ function getRandomWord() {
     .then(res => res.json())
     .then(data => {
       getGameData()
-      words = data;
-      let randInd = Math.floor(Math.random() * data.length);
-      winningWord = data[randInd]
+      if (easy) {
+        words = data.filter(word => {
+ 
+        let splitWord = word.split('')
+  
+        return splitWord.every((letter, index) => {
+          return splitWord.indexOf(letter) === index
+        });
+        });
+      } else {
+        words = data;
+      }
+    
+      let randInd = Math.floor(Math.random() * words.length);
+      winningWord = words[randInd]
     })
 }
 
