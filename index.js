@@ -72,6 +72,7 @@ function postGameData() {
     }
   })
   .then(response => response.json())
+  .then(json => console.log(json))
   .catch(err => "Did not send");
 }
 
@@ -106,10 +107,10 @@ function updateInputPermissions() {
 
 function moveToNextInput(e) {
   var key = e.keyCode || e.charCode;
-  if( key >= 65 && key <= 90) {
+  if( key >= 65 && key <= 90 || key === 39) {
     nextIndex = parseInt(e.target.id.split('-')[2]) + 1;
     inputs[nextIndex].focus();
-  } else if (key === 8) {
+  } else if (key === 8 || key === 37) {
     var indexOfPrev = parseInt(e.target.id.split('-')[2]) - 1;
     inputs[indexOfPrev].focus();
   }
