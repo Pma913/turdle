@@ -2,9 +2,10 @@
 var winningWord = '';
 var currentRow = 1;
 var guess = '';
-var gamesPlayed = [];
-var words = [];
+// var gamesPlayed = [];
+// var words = [];
 var nextIndex;
+var lastGame = {}
 
 // Query Selectors
 var inputs = document.querySelectorAll('input');
@@ -53,10 +54,41 @@ function getRandomWord() {
   fetch("http://localhost:3001/api/v1/words")
     .then(res => res.json())
     .then(data => {
+      getGameData()
       words = data;
       let randInd = Math.floor(Math.random() * data.length);
       winningWord = data[randInd]
     })
+}
+
+function postGameData() {
+  fetch('http://localhost:3001/api/v1/games', {
+    method: 'POST',
+    body: JSON.stringify(
+      lastGame
+    ),
+    headers: {
+  	  'Content-Type': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .catch(err => "Did not send");
+}
+
+function getGameData() {
+  fetch('http://localhost:3001/api/v1/games')
+  .then(res => res.json())
+  .then(data => {
+    let gamesWon = data.filter(game => game.solved);
+    let sumOfGuesses = data.reduce((acc, guess) => {
+      acc += guess.numGuesses;
+      return acc;
+    }, 0);
+  
+    totalGames.innerText = `${data.length}`;
+    percentGamesWon.innerText = `${Math.floor((gamesWon.length / data.length) * 100)}`;
+    averageGuessCount.innerText = `${Math.ceil(sumOfGuesses / data.length)}`;
+  });
 }
 
 function updateInputPermissions() {
@@ -105,7 +137,7 @@ function submitGuess() {
     if (checkForWin()) {
       setTimeout(declareWinner, 1000);
     } else if (!checkForWin() && currentRow === 6) {
-      setTimeout(declareWinner(), 1000)
+      setTimeout(declareWinner, 1000)
       setTimeout(resetText, 5000)
     } else {
       changeRow();
@@ -193,10 +225,12 @@ function resetText() {
 
 function recordGameStats() {
   if (checkForWin()) {
-    gamesPlayed.push({ solved: true, guesses: currentRow });
+    lastGame = { solved: true, guesses: currentRow }
   } else {
-    gamesPlayed.push({ solved: false, guesses: currentRow });
+    lastGame = { solved: false, guesses: currentRow }
   }
+
+  postGameData()
 }
 
 function changeGameOverText() {
@@ -231,19 +265,6 @@ function clearKey() {
   keyLetters.forEach(key => key.classList.remove('correct-location-key', 'wrong-location-key', 'wrong-key'));
 }
 
-function updateStats() {
-  let gamesWon = gamesPlayed.filter(game => game.solved);
-  let numberOfGuesses = gamesWon.map(game => game.guesses);
-  let sumOfGuesses = numberOfGuesses.reduce((acc, guess) => {
-    acc += guess;
-    return acc;
-  }, 0);
-  
-  totalGames.innerText = `${gamesPlayed.length}`;
-  percentGamesWon.innerText = `${Math.floor((gamesWon.length / gamesPlayed.length) * 100)}`;
-  averageGuessCount.innerText = `${Math.floor(sumOfGuesses / gamesPlayed.length)}`;
-}
-
 // Change Page View Functions
 
 function viewRules() {
@@ -268,7 +289,6 @@ function viewGame() {
 }
 
 function viewStats() {
-  updateStats();
   letterKey.classList.add('hidden');
   gameBoard.classList.add('collapsed');
   rules.classList.add('collapsed');
